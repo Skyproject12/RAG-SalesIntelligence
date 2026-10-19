@@ -131,7 +131,7 @@ export function AIAssistant() {
         <div className="flex flex-col items-center text-center">
           <RobotIllustration />
           <h2 className="text-[22px] font-bold tracking-[-0.02em] text-[#07173a]">
-            AI Assistant
+            Sky
           </h2>
           <p className="mt-2 text-[15px] text-[#7888ae]">
             Tanyakan apa saja tentang performa tim sales.
@@ -176,7 +176,7 @@ export function AIAssistant() {
           className="size-5 shrink-0 fill-[#1680f7] text-[#1680f7]"
         />
         <label htmlFor="assistant-question" className="sr-only">
-          Pertanyaan untuk AI Assistant
+          Pertanyaan untuk Sky
         </label>
         <input
           ref={inputRef}
@@ -219,7 +219,7 @@ function ConversationHeader() {
       />
       <div>
         <h2 className="text-[28px] font-bold tracking-[-0.025em] text-[#07173a]">
-          AI Assistant
+          Sky
         </h2>
         <p className="mt-1 text-[15px] text-[#7888ae]">
           Tanyakan apa saja tentang performa tim sales.

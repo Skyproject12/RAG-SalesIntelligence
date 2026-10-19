@@ -42,7 +42,7 @@ func (h *AIHandler) Chat(c *gin.Context) {
 	if err != nil {
 		c.Error(err)
 		c.JSON(http.StatusBadGateway, gin.H{
-			"error": "AI Assistant sedang tidak tersedia",
+			"error": "Sky sedang tidak tersedia",
 		})
 		return
 	}

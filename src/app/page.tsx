@@ -16,7 +16,7 @@ export default function HomePage() {
             Welcome, Admin!
           </h1>
           <p className="mt-2 max-w-[520px] text-[15px] leading-6 text-[#7586ae]">
-            Gunakan AI Assistant untuk menanyakan informasi seputar
+            Gunakan Sky untuk menanyakan informasi seputar
             <br className="hidden sm:block" /> performa tim sales dengan cepat
             dan mudah.
           </p>

@@ -36,7 +36,7 @@ async function send(request: ChatRequest): Promise<ChatResult> {
   });
 
   if (!response.ok) {
-    let message = "AI Assistant sedang tidak tersedia.";
+    let message = "Sky sedang tidak tersedia.";
 
     try {
       const payload = (await response.json()) as ChatErrorResponse;
