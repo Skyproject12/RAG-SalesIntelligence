@@ -63,7 +63,7 @@ export function AIAssistant() {
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [requestError, setRequestError] = useState("");
-  const conversationEndRef = useRef<HTMLDivElement>(null);
+  const conversationRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { trigger, isMutating } = useSWRMutation<
     ChatResult,
@@ -73,9 +73,10 @@ export function AIAssistant() {
   >(chatEndpoint, chatMutation);
 
   useEffect(() => {
-    conversationEndRef.current?.scrollIntoView({
+    const conversation = conversationRef.current;
+    conversation?.scrollTo({
+      top: conversation.scrollHeight,
       behavior: "smooth",
-      block: "nearest",
     });
   }, [messages, isMutating, requestError]);
 
@@ -118,8 +119,10 @@ export function AIAssistant() {
 
   return (
     <section
-      className={`rounded-[11px] border border-[#dce9fa] bg-white/90 shadow-[0_2px_8px_rgba(34,98,173,0.04)] ${
-        hasConversation ? "px-5 py-7 sm:px-8" : "px-5 py-10 sm:px-10 sm:py-11"
+      className={`flex h-[min(680px,calc(100dvh-220px))] min-h-[480px] flex-col overflow-hidden rounded-[11px] border border-[#dce9fa] bg-white/90 shadow-[0_2px_8px_rgba(34,98,173,0.04)] ${
+        hasConversation
+          ? "px-5 py-7 sm:px-8"
+          : "px-5 py-10 sm:px-10 sm:py-11"
       }`}
     >
       {hasConversation ? (
@@ -145,7 +148,8 @@ export function AIAssistant() {
 
       {hasConversation && (
         <div
-          className="mt-8 max-h-[560px] min-h-[220px] space-y-7 overflow-y-auto px-1 pb-2 pr-2"
+          ref={conversationRef}
+          className="mt-8 min-h-0 flex-1 space-y-7 overflow-y-auto px-1 pb-24 pr-2"
           aria-live="polite"
           aria-label="Riwayat percakapan"
         >
@@ -156,17 +160,15 @@ export function AIAssistant() {
               <AssistantMessage key={message.id} message={message} />
             ),
           )}
-
           {isMutating && <AssistantLoading />}
           {requestError && <AssistantError message={requestError} />}
-          <div ref={conversationEndRef} />
         </div>
       )}
 
       <form
         onSubmit={handleSubmit}
-        className={`flex h-[70px] items-center gap-4 rounded-[11px] border border-[#dbe7f8] bg-white px-4 shadow-[0_3px_12px_rgba(36,91,160,0.06)] sm:px-5 ${
-          hasConversation ? "mt-7" : "mt-[50px]"
+        className={`fixed bottom-5 left-5 right-5 z-50 flex h-[70px] items-center gap-4 rounded-[11px] border border-[#dbe7f8] bg-white px-4 shadow-[0_8px_24px_rgba(36,91,160,0.14)] sm:bottom-6 sm:left-10 sm:right-10 sm:px-5 lg:left-[282px] lg:right-12 ${
+          hasConversation ? "mt-7" : "mt-auto"
         }`}
       >
         <Sparkles
