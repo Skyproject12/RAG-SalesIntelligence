@@ -14,9 +14,11 @@ const (
 )
 
 type Config struct {
-	DatabaseURL string
-	Port        string
-	FrontendURL string
+	DatabaseURL  string
+	Port         string
+	FrontendURL  string
+	GeminiAPIKey string
+	GeminiModel  string
 }
 
 func Load() (Config, error) {
@@ -38,8 +40,10 @@ func Load() (Config, error) {
 	}
 
 	return Config{
-		DatabaseURL: databaseURL,
-		Port:        port,
-		FrontendURL: frontendURL,
+		DatabaseURL:  databaseURL,
+		Port:         port,
+		FrontendURL:  frontendURL,
+		GeminiAPIKey: strings.TrimSpace(os.Getenv("GEMINI_API_KEY")),
+		GeminiModel:  strings.TrimSpace(os.Getenv("GEMINI_MODEL")),
 	}, nil
 }

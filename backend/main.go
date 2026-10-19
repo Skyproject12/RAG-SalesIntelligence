@@ -20,7 +20,7 @@ func main() {
 	}
 	defer db.Close()
 
-	engine := router.New(db, cfg.FrontendURL)
+	engine := router.New(db, cfg)
 	log.Printf("Backend berjalan di http://localhost:%s", cfg.Port)
 	if err := engine.Run(":" + cfg.Port); err != nil {
 		log.Fatal("Gagal menjalankan server:", err)

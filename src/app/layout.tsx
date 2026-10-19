@@ -7,7 +7,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Sales Intelligence",
+  title: "Sky",
   description: "Dashboard untuk memantau pipeline dan peluang penjualan.",
 };
 

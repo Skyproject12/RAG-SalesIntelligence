@@ -77,6 +77,7 @@ type SalesFilter struct {
 	RegionCode string
 	Status     string
 	Target     string
+	Sort       string
 	Limit      int
 	Offset     int
 }
@@ -99,7 +100,7 @@ func (r *SalesRepository) List(
 	}
 
 	query := `SELECT * FROM (` + salesSelectQuery + `) AS sales` + salesFilterClause + `
-		ORDER BY sales.name ASC
+		ORDER BY ` + salesOrderClause(filter.Sort) + `
 		LIMIT $5 OFFSET $6
 	`
 	rows, err := r.db.QueryContext(
@@ -131,6 +132,114 @@ func (r *SalesRepository) List(
 	}
 
 	return sales, total, nil
+}
+
+func (r *SalesRepository) FindBySalesCode(
+	ctx context.Context,
+	salesCode string,
+) (model.Sales, error) {
+	query := `SELECT * FROM (` + salesSelectQuery + `) AS sales
+		WHERE sales.sales_code = $1
+	`
+	item, err := scanSales(r.db.QueryRowContext(ctx, query, salesCode))
+	if err != nil {
+		return model.Sales{}, err
+	}
+
+	return item, nil
+}
+
+func (r *SalesRepository) Summary(
+	ctx context.Context,
+	regionCode string,
+) (model.SalesSummary, error) {
+	query := `SELECT
+		COUNT(*),
+		COUNT(*) FILTER (WHERE achievement_percent < 75),
+		COUNT(*) FILTER (
+			WHERE achievement_percent >= 75 AND achievement_percent < 100
+		),
+		COUNT(*) FILTER (WHERE achievement_percent >= 100),
+		COUNT(*) FILTER (WHERE achievement_percent < 100),
+		COALESCE(SUM(target_amount), 0)::float8,
+		COALESCE(SUM(achieved_amount), 0)::float8,
+		ROUND(COALESCE(AVG(achievement_percent), 0), 2)::float8
+	FROM (` + salesSelectQuery + `) AS sales
+	WHERE ($1 = '' OR sales.region_code = $1)`
+
+	var summary model.SalesSummary
+	if err := r.db.QueryRowContext(ctx, query, regionCode).Scan(
+		&summary.TotalSalesReps,
+		&summary.BelowTargetCount,
+		&summary.OnTrackCount,
+		&summary.OverTargetCount,
+		&summary.NotAchievedCount,
+		&summary.TotalTargetAmount,
+		&summary.TotalAchievedAmount,
+		&summary.AverageAchievementPercent,
+	); err != nil {
+		return model.SalesSummary{}, fmt.Errorf(
+			"gagal mengambil ringkasan sales: %w",
+			err,
+		)
+	}
+
+	summary.Region = "Semua Wilayah"
+	summary.RegionCode = regionCode
+	return summary, nil
+}
+
+func (r *SalesRepository) RegionSummaries(
+	ctx context.Context,
+) ([]model.SalesSummary, error) {
+	query := `SELECT
+		COALESCE(region, 'Tanpa Wilayah'),
+		COALESCE(region_code, ''),
+		COUNT(*),
+		COUNT(*) FILTER (WHERE achievement_percent < 75),
+		COUNT(*) FILTER (
+			WHERE achievement_percent >= 75 AND achievement_percent < 100
+		),
+		COUNT(*) FILTER (WHERE achievement_percent >= 100),
+		COUNT(*) FILTER (WHERE achievement_percent < 100),
+		COALESCE(SUM(target_amount), 0)::float8,
+		COALESCE(SUM(achieved_amount), 0)::float8,
+		ROUND(COALESCE(AVG(achievement_percent), 0), 2)::float8
+	FROM (` + salesSelectQuery + `) AS sales
+	GROUP BY region, region_code
+	ORDER BY region ASC`
+
+	rows, err := r.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("gagal mengambil perbandingan wilayah: %w", err)
+	}
+	defer rows.Close()
+
+	summaries := make([]model.SalesSummary, 0)
+	for rows.Next() {
+		var summary model.SalesSummary
+		if err := rows.Scan(
+			&summary.Region,
+			&summary.RegionCode,
+			&summary.TotalSalesReps,
+			&summary.BelowTargetCount,
+			&summary.OnTrackCount,
+			&summary.OverTargetCount,
+			&summary.NotAchievedCount,
+			&summary.TotalTargetAmount,
+			&summary.TotalAchievedAmount,
+			&summary.AverageAchievementPercent,
+		); err != nil {
+			return nil, fmt.Errorf("gagal membaca ringkasan wilayah: %w", err)
+		}
+		summaries = append(summaries, summary)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("gagal membaca perbandingan wilayah: %w", err)
+	}
+
+	return summaries, nil
 }
 
 func (r *SalesRepository) FindByID(
@@ -165,6 +274,21 @@ func (r *SalesRepository) count(
 	}
 
 	return total, nil
+}
+
+func salesOrderClause(sort string) string {
+	switch sort {
+	case "achievement_desc":
+		return "sales.achievement_percent DESC, sales.name ASC"
+	case "achievement_asc":
+		return "sales.achievement_percent ASC, sales.name ASC"
+	case "achieved_amount_desc":
+		return "sales.achieved_amount DESC, sales.name ASC"
+	case "target_amount_desc":
+		return "sales.target_amount DESC, sales.name ASC"
+	default:
+		return "sales.name ASC"
+	}
 }
 
 type scanner interface {

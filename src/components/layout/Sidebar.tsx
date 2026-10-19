@@ -13,7 +13,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="border-b border-[#dce8fa] bg-white px-5 py-5 lg:min-h-screen lg:border-b-0 lg:border-r">
+    <aside className="border-b border-[#dce8fa] bg-white px-5 py-5 lg:sticky lg:top-0 lg:h-screen lg:self-start lg:overflow-y-auto lg:border-b-0 lg:border-r">
       <Link
         href="/home"
         className="flex h-11 items-center gap-3 px-1 font-semibold tracking-[-0.01em] text-[#07183c]"
@@ -23,7 +23,7 @@ export function Sidebar() {
           className="size-7 fill-[#167cf5] text-[#167cf5]"
           strokeWidth={1.8}
         />
-        <span className="text-[16px]">Sales Intelligence</span>
+        <span className="text-[16px]">Sky</span>
       </Link>
 
       <nav className="mt-5 flex gap-2 lg:flex-col" aria-label="Navigasi utama">

@@ -2,7 +2,7 @@ import { ChevronDown, Sun, UsersRound } from "lucide-react";
 
 export function Header() {
   return (
-    <header className="flex h-[65px] items-center justify-between border-b border-[#dce9f8] bg-white px-4 sm:px-6">
+    <header className="sticky top-0 z-30 flex h-[65px] items-center justify-between border-b border-[#dce9f8] bg-white px-4 sm:px-6">
       <button
         type="button"
         aria-label="Pilih sales aktif"

@@ -19,14 +19,24 @@ const questions = [
   },
 ];
 
-export function SuggestedQuestions() {
+interface SuggestedQuestionsProps {
+  disabled?: boolean;
+  onSelect?: (question: string) => void;
+}
+
+export function SuggestedQuestions({
+  disabled = false,
+  onSelect,
+}: SuggestedQuestionsProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
       {questions.map(({ text, icon: Icon }) => (
         <button
           key={text}
           type="button"
-          className="flex min-h-16 items-center gap-4 rounded-[10px] bg-[#f2f7fe] px-5 py-3 text-left text-[12px] leading-5 text-[#1269d7] transition hover:bg-[#e8f2ff]"
+          disabled={disabled}
+          onClick={() => onSelect?.(text)}
+          className="flex min-h-16 items-center gap-4 rounded-[10px] bg-[#f2f7fe] px-5 py-3 text-left text-[12px] leading-5 text-[#1269d7] transition hover:bg-[#e8f2ff] disabled:cursor-not-allowed disabled:opacity-60"
         >
           <Icon aria-hidden="true" className="size-5 shrink-0 text-[#1680f7]" strokeWidth={2.1} />
           <span>{text}</span>
