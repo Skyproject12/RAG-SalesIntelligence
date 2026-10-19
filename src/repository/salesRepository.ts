@@ -67,8 +67,9 @@ function toSale(item: SalesApiItem): Sale {
   };
 }
 
-export async function getSales(query: SalesQuery): Promise<SalesResult> {
-  const apiUrl = process.env.API_URL ?? "http://localhost:8080";
+async function getAll(query: SalesQuery): Promise<SalesResult> {
+  const apiUrl =
+    process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
   const url = new URL("/api/v1/sales", apiUrl);
 
   url.searchParams.set("page", String(query.page));
@@ -79,7 +80,11 @@ export async function getSales(query: SalesQuery): Promise<SalesResult> {
   if (query.status) url.searchParams.set("status", query.status);
   if (query.target) url.searchParams.set("target", query.target);
 
-  const response = await fetch(url, { cache: "no-store" });
+  const response = await fetch(url, {
+    headers: {
+      Accept: "application/json",
+    },
+  });
 
   if (!response.ok) {
     throw new Error(`API sales merespons dengan status ${response.status}`);
@@ -101,3 +106,7 @@ export async function getSales(query: SalesQuery): Promise<SalesResult> {
     },
   };
 }
+
+export const salesRepository = {
+  getAll,
+};

@@ -8,11 +8,15 @@ import (
 	"github.com/joho/godotenv"
 )
 
-const defaultPort = "8080"
+const (
+	defaultPort        = "8080"
+	defaultFrontendURL = "http://localhost:3000"
+)
 
 type Config struct {
 	DatabaseURL string
 	Port        string
+	FrontendURL string
 }
 
 func Load() (Config, error) {
@@ -28,8 +32,14 @@ func Load() (Config, error) {
 		port = defaultPort
 	}
 
+	frontendURL := strings.TrimSpace(os.Getenv("FRONTEND_URL"))
+	if frontendURL == "" {
+		frontendURL = defaultFrontendURL
+	}
+
 	return Config{
 		DatabaseURL: databaseURL,
 		Port:        port,
+		FrontendURL: frontendURL,
 	}, nil
 }

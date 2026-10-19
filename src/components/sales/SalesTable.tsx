@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, Ellipsis } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { formatCurrency } from "@/lib/utils";
 import type {
@@ -9,6 +9,8 @@ import type {
   SalesQuery,
   SalesStatus,
 } from "@/types/sales";
+
+import { SalesActionMenu } from "./SalesActionMenu";
 
 interface SalesTableProps {
   sales: Sale[];
@@ -185,13 +187,7 @@ export function SalesTable({ sales, pagination, query }: SalesTableProps) {
                   </span>
                 </td>
                 <td className="px-3 text-center">
-                  <button
-                    type="button"
-                    aria-label={`Buka aksi untuk ${sale.name}`}
-                    className="inline-grid size-8 place-items-center rounded-md border border-[#e6edf8] text-[#37649f] shadow-[0_2px_6px_rgba(55,100,159,0.04)] transition hover:border-[#bdd8fb] hover:bg-[#f3f8ff]"
-                  >
-                    <Ellipsis aria-hidden="true" className="size-4" />
-                  </button>
+                  <SalesActionMenu sale={sale} />
                 </td>
               </tr>
             ))}

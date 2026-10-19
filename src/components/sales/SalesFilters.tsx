@@ -1,5 +1,7 @@
 "use client";
 
+import type { FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { ChevronDown, Search } from "lucide-react";
 
 import { salesRegions, salesStatuses } from "@/types/sales";
@@ -69,10 +71,28 @@ const statusOptions = salesStatuses.map((status) => ({
 }));
 
 export function SalesFilters({ values }: { values: SalesFilterValues }) {
+  const router = useRouter();
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+    const params = new URLSearchParams();
+
+    for (const name of ["search", "region", "status", "target"]) {
+      const value = String(formData.get(name) ?? "").trim();
+      if (value) params.set(name, value);
+    }
+
+    const query = params.toString();
+    router.push(query ? `/sales?${query}` : "/sales");
+  }
+
   return (
     <form
       action="/sales"
       method="get"
+      onSubmit={handleSubmit}
       className="grid gap-3 rounded-lg border border-[#e2ebf7] bg-white p-[15px] shadow-[0_3px_14px_rgba(48,91,151,0.04)] md:grid-cols-2 xl:grid-cols-[minmax(320px,2.6fr)_repeat(3,minmax(150px,1fr))]"
     >
       <label className="relative min-w-0">

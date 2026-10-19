@@ -1,74 +1,7 @@
 import { Suspense } from "react";
 
-import { SalesFilters } from "@/components/sales/SalesFilters";
-import { SalesTable } from "@/components/sales/SalesTable";
-import { getSales } from "@/repository/salesRepository";
-import type { SalesQuery } from "@/types/sales";
+import { SalesContent } from "@/components/sales/SalesContent";
 import { UsersRound } from "lucide-react";
-
-type SalesSearchParams = Promise<
-  Record<string, string | string[] | undefined>
->;
-
-function singleValue(value: string | string[] | undefined): string {
-  return Array.isArray(value) ? value[0] ?? "" : value ?? "";
-}
-
-function positiveInteger(value: string, fallback: number): number {
-  const result = Number.parseInt(value, 10);
-  return Number.isInteger(result) && result > 0 ? result : fallback;
-}
-
-async function SalesContent({
-  searchParams,
-}: {
-  searchParams: SalesSearchParams;
-}) {
-  const params = await searchParams;
-  const query: SalesQuery = {
-    page: positiveInteger(singleValue(params.page), 1),
-    limit: 10,
-    search: singleValue(params.search).trim(),
-    region: singleValue(params.region).trim(),
-    status: singleValue(params.status).trim(),
-    target: singleValue(params.target).trim(),
-  };
-
-  const result = await getSales(query).catch((error: unknown) => {
-    console.error("Gagal mengambil data dari backend:", error);
-    return null;
-  });
-
-  if (!result) {
-    return (
-      <div className="mt-5 rounded-lg border border-[#ffd5d5] bg-[#fff8f8] px-5 py-6 text-[13px] text-[#a33939]">
-        <p className="font-semibold">Data sales tidak dapat dimuat.</p>
-        <p className="mt-1">
-          Pastikan backend Go berjalan di http://localhost:8080, kemudian muat
-          ulang halaman ini.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <>
-      <div className="mt-5">
-        <SalesFilters
-          key={`${query.search}-${query.region}-${query.status}-${query.target}`}
-          values={query}
-        />
-      </div>
-      <div className="mt-3">
-        <SalesTable
-          sales={result.sales}
-          pagination={result.pagination}
-          query={query}
-        />
-      </div>
-    </>
-  );
-}
 
 function SalesLoading() {
   return (
@@ -79,11 +12,7 @@ function SalesLoading() {
   );
 }
 
-export default function SalesPage({
-  searchParams,
-}: {
-  searchParams: SalesSearchParams;
-}) {
+export default function SalesPage() {
   return (
     <section className="mx-auto max-w-[1256px] lg:-mx-6 lg:-mt-[54px] lg:max-w-none">
       <div className="flex items-start gap-4 px-2">
@@ -103,7 +32,7 @@ export default function SalesPage({
       </div>
 
       <Suspense fallback={<SalesLoading />}>
-        <SalesContent searchParams={searchParams} />
+        <SalesContent />
       </Suspense>
     </section>
   );
